@@ -32,5 +32,56 @@ let's break down this Dockerfile step by step:
 4. **RUN pip install --no-cache-dir --upgrade pip :** This command upgrades pip,the Python package installer,to the latest version and --no-cache-dir flag prevents caching of downloaded packages.
 5. **RUN pip install --no-cache-dir -r requirements.txt :** This will help to install all python dependencies listed in **requirements.txt**
 6. **EXPOSE 5000 :** This exposes port 5000 on the Docker container.
-7. **ENTRYPOINT ["python","app.py"] :** This specifies the command that will be executed when the Docker container starts. 
+7. **ENTRYPOINT ["python","app.py"] :** This specifies the command that will be executed when the Docker container starts.
+
+**docker-compose.yml :**
+```
+
+version: '3.8'
+services:
+  app:
+    build: .
+    environment:
+      - APP_HOST=0.0.0.0
+      - REDIS_HOST=127.0.0.1
+      - REDIS_PORT=6379
+      - DATABASE_URI=mysql+pymysql://<user>:<password>@<host>:3306/<db_name>
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+      - db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/status"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+  redis:
+    image: "redis:latest"
+  db:
+    image: "mysql:latest"
+    environment:
+      - MYSQL_DATABASE=db_name
+      - MYSQL_USER=username
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root_password
+```
+let's break down this docker-compose.yml step by step:
+
+1. **version: '3.8' :** This indicates the version of docker-compose being used, here it is 3.8
+2. **services :** This section defines the container service.
+
+    **app:** This section defines the application container  It's built from the current directory (build: .) from the Dockerfile defined. It sets environment variables such 
+             as APP_HOST, REDIS_HOST,REDIS_PORT, and DATABASE_URI. It exposes port 5000 on the host machine and maps it to port 5000 in the container (ports: - "5000:5000"). 
+             It depends on the redis and db services. It also defines a health check to verify the health of the application using a curl command every 30 seconds.
+
+    **redis:** In this section the redis container will be created with latest image.
+
+    **db:** In this section db container will be created with image tag latest also it sets environment variables for the MySQL database such as MYSQL_DATABASE, MYSQL_USER, 
+            MYSQL_PASSWORD, and MYSQL_ROOT_PASSWORD.
+
+Next step is to build and start the application with 
+   **docker-compose up --build -d**
+
+ 
 
