@@ -146,7 +146,20 @@ mysql> SHOW DATABASES;
 +--------------------+
 ```
 
-
+**Checked all endpoints:**
+```
+curl http://localhost:5000
+Hello, World!
+[root@ip-172-31-22-182 project]# curl http://localhost:5000/admin
+admin area
+[root@ip-172-31-22-182 project]# curl http://localhost:5000/palindrom/asd
+Text is not palindrom
+[root@ip-172-31-22-182 project]# curl http://localhost:5000/status
+OK
+[root@ip-172-31-22-182 project]# curl http://localhost:5000/redis-hits
+Redis hits 1
+```
+when providing a palindrom sequence to the endpoint it is not storing to DB to as expected instead it throwing som **Internal server error**
 
 
  
